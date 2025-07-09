@@ -1,0 +1,9 @@
+# DB
+db.sqlite3
+
+# Cache files
+*.pyc
+# Migrations
+**/__pycache__/
+**/migrations/
+*.py[cod]
