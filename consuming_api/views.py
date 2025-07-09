@@ -63,8 +63,8 @@ class CreateCountry(GenericAPIView):
             data = response.json()
             Country.objects.create(name=data[0]['name']['common'], region=data[0]['region'], subregion=data[0]['subregion'],
                                 capital=data[0].get('capital', ['Desconocida'])[0], population=data[0]['population'],
-                                languages=len(data[0]['translations']), latitude=data[0]['latlng'][0], 
-                                longitude=data[0]['latlng'][1], area=data[0]['area'], flag=data[0]['flags']['alt'])
+                                latitude=data[0]['latlng'][0], longitude=data[0]['latlng'][1], area=data[0]['area'],
+                                flag=data[0]['flags']['alt'])
             return Response({'ok': True, 'succes': 'New country created'}, status=response.status_code)
         else:
             return Response({'ok': False, 'error': 'Not found data'}, status=response.status_code)
