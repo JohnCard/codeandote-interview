@@ -4,14 +4,80 @@ import requests
 import matplotlib
 matplotlib.use('Agg')  # ⚠️ Importante para evitar errores en macOS
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 import numpy as np
 import io
-from PIL import Image as PILImage
 from openpyxl.drawing.image import Image as OpenpyxlImage
 from .styles import BORDER
+import random
+from faker import Faker
+import random
+
+fake = Faker()
+
+img_list = [
+    'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png', 'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png', 'https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_t.png', 'https://fakestoreapi.com/img/71YXzeOuslL._AC_UY879_t.png', 'https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_t.png', 'https://fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_t.png', 'https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_t.png', 'https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_t.png', 'https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_t.png', 'https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_t.png', 'https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_t.png', 'https://fakestoreapi.com/img/61mtL65D4cL._AC_SX679_t.png', 'https://fakestoreapi.com/img/81QpkIctqPL._AC_SX679_t.png', 'https://fakestoreapi.com/img/81Zt42ioCgL._AC_SX679_t.png', 'https://fakestoreapi.com/img/51Y5NI-I5jL._AC_UX679_t.png', 'https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_t.png', 'https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2t.png', 'https://fakestoreapi.com/img/71z3kpMAYsL._AC_UY879_t.png', 'https://fakestoreapi.com/img/51eg55uWmdL._AC_UX679_t.png', 'https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_t.png']
 
 # Additional functions
+
+def generate_product_name():
+    brands = ['NovaTech', 'EcoStyle', 'UrbanHome', 'QuickWear', 'SmartLife', 'ZenGo']
+    product_types = [
+        'Chair', 'Laptop', 'Tablet', 'Sofa', 'T-Shirt', 'Blender', 'Microwave',
+        'Smartwatch', 'TV', 'Backpack', 'Sneakers', 'Desk Lamp', 'Vacuum', 'Camera'
+    ]
+
+    brand = random.choice(brands)
+    adjective = fake.word().capitalize()
+    product = random.choice(product_types)
+
+    return f"{brand} {adjective} {product}"
+
+def generate_product_description():
+    features = [
+        "sleek design", "lightweight build", "intuitive functionality", "durable materials",
+        "long-lasting battery", "high performance", "smart features", "compact size",
+        "ergonomic style", "modern aesthetics"
+    ]
+
+    use_cases = [
+        "Perfect for home or office use.",
+        "Ideal for everyday tasks and travel.",
+        "Designed for comfort and efficiency.",
+        "A reliable choice for tech lovers.",
+        "Built to enhance your lifestyle.",
+    ]
+
+    feature1 = random.choice(features)
+    feature2 = random.choice(features)
+    use_case = random.choice(use_cases)
+
+    description = (
+        f"This product combines {feature1} with {feature2}. "
+        f"{use_case}"
+    )
+
+    return description
+
+def random_decimal(min_value, max_value, decimals=2):
+    """
+    Genera un número decimal aleatorio entre min_value y max_value
+    redondeado a 'decimals' cifras decimales.
+
+    :param min_value: mínimo valor (float)
+    :param max_value: máximo valor (float)
+    :param decimals: cantidad de decimales para redondear (int, default=2)
+    :return: número decimal aleatorio (float)
+    """
+    number = random.uniform(min_value, max_value)
+    return round(number, decimals)
+
+# Random id
+def random_index():
+    indices = [5,6,7,8,9,10,11,12,13,14]
+    return random.choice(indices)
+
+def random_image():
+    return random.choice(img_list)
 
 # Return a predifined number of maximum values
 def return_max_numbers(n, list_numbers):
@@ -128,7 +194,7 @@ def apply_graph_styles(ws, ax, main_dic, fig, grid=False):
     ax.tick_params(axis='x', rotation=25)
 
     fig.patch.set_facecolor(main_dic['facecolor'])  # Fondo exterior
-    ax.set_facecolor(main_dic['background'])         # Fondo del área de gráfico
+    ax.set_facecolor(main_dic['background'])        # Fondo del área de gráfico
 
     if grid == True:
         ax.grid(color = 'black', linestyle = '-', linewidth = 0.5)
@@ -145,8 +211,8 @@ def bar(ws, main_dic):
 
     if 'legend' in main_dic:
         bar_labels = x_labels
-        ax.bar(x_labels, graph_values, label=bar_labels, color=bar_colors, edgecolor='black')
-        ax.legend(title='Legend title', loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+        ax.bar(x_labels, graph_values, label=bar_labels, color=bar_colors, edgecolor=main_dic['edgecolor'])
+        ax.legend(title=main_dic['legend_title'], loc="center left", bbox_to_anchor=(1, 0.5))
     else:
         ax.var(x_labels, graph_values, color=bar_colors, edgecolor='black')
 
@@ -159,12 +225,11 @@ def bar(ws, main_dic):
 # Specific function to create a lineal graph
 def line(ws, main_dic):
     fig, ax = plt.subplots(figsize=main_dic['figsize'])
-    # ax.plot(main_dic['labels'], main_dic['graph_values'], main_dic['labels_b'], main_dic['graph_values_b'], marker='o', linestyle='-')
-    ax.plot(main_dic['labels'], main_dic['graph_values'], marker='o', linestyle='-')
+    ax.plot(main_dic['labels'], main_dic['graph_values'], marker=main_dic['marker'], linestyle=main_dic['linestyle'])
 
     # Show values for each point
     for i, valor in enumerate(main_dic['graph_values']):
-        ax.text(main_dic['labels'][i], valor + 1, str(valor), ha='center', fontsize=10, color='black')
+        ax.text(main_dic['labels'][i], valor + 1, str(valor), ha='center', fontsize=10, color=main_dic['color'])
 
     apply_graph_styles(ws, ax, main_dic, fig, True)
 
@@ -172,9 +237,12 @@ def line(ws, main_dic):
 def pie(ws, main_dic):
     fig, ax = plt.subplots()
     graph_values = main_dic['graph_values']
+    # '%1.1f%%' significa:
+    # 1.1f: un decimal (por ejemplo, 25.3%)
+    # %%: el símbolo de porcentaje
     ax.pie(graph_values, labels=main_dic['labels'], autopct='%1.1f%%', shadow=True,
-        textprops={'color': 'black', 'font': 'Courier New', 'weight': 'bold', 'size': 10})
-    plt.legend(title="Ingredients", loc="center left", bbox_to_anchor=(1, 1))
+        textprops={'color': main_dic['color'], 'font': main_dic['font'], 'weight': main_dic['weight'], 'size': main_dic['size']},)
+    plt.legend(title=main_dic['legend_title'], loc="center left", bbox_to_anchor=(1, 1))
     
     apply_graph_styles(ws, ax, main_dic, fig)
 
@@ -184,12 +252,13 @@ def histogram(ws, main_dic):
     graph_values = main_dic['graph_values']
     set_values = len(set(graph_values))
 
-    n, bins, patches = ax.hist(graph_values, bins=set_values, color="darkgreen", edgecolor="black")
+    n, bins, patches = ax.hist(graph_values, bins=set_values, color=main_dic['color'], edgecolor=main_dic['edgecolor'],
+                            linestyle=main_dic['linestyle'])
 
     # Show values for each bar
     for count, bin_left, bin_right in zip(n, bins[:-1], bins[1:]):
         x = (bin_left + bin_right) / 2  # punto medio del bin
-        ax.text(x, count + 1, str(int(count)), ha='center', fontsize=10)
+        ax.text(x, count + 1, str(int(count)), ha='center', fontsize=main_dic['font_size'])
 
     apply_graph_styles(ws, ax, main_dic, fig)
 

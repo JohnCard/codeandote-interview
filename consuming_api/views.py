@@ -117,7 +117,9 @@ def excel_report(request):
             'legend': True,
             'facecolor': '#d0d3d4',
             'background': '#f0f0f0',
-            'figsize': (10,4)
+            'figsize': (10,4),
+            'legend_title': 'Country list',
+            'edgecolor': 'black'
         }
 
     bar(ws, PROPERTIES)
@@ -125,7 +127,14 @@ def excel_report(request):
     PROPERTIES.pop('y_title')
     PROPERTIES.pop('x_title')
 
-    PROPERTIES.update({'position': 'Q2'})
+    PROPERTIES.update({'position': 'Q2',
+                       'legend_title': 'Area distribution',
+                       'color': 'black',
+                       'font': 'Courier New',
+                        'weight': 'light',
+                        'size': 10
+                       })
+
 
     pie(ws, PROPERTIES)
 
@@ -156,7 +165,7 @@ def excel_report(request):
     lat_names = [country.name for country in longest_latitudes]
 
     PROPERTIES.update({'position': 'Z2', 'x_title': 'Countries', 'y_title': 'longitudes', 'main_title': 'Greatest longitudes',
-                    'graph_values': long_values, 'labels': long_names, 'figsize': (10, 4)})
+                    'graph_values': long_values, 'labels': long_names, 'figsize': (10, 4), 'marker': 'o', 'linestyle': '-'})
 
     line(ws, PROPERTIES)
 
