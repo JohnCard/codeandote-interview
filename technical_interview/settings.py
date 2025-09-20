@@ -134,11 +134,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # cors autorization
-CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5500']
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:5500', 'https://online-ecommerce-ten.vercel.app', 'https://johncard.github.io']
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:5500"
-]
+    "http://127.0.0.1:5500", 'https://online-ecommerce-ten.vercel.app', 'https://johncard.github.io']
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
