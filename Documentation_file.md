@@ -89,7 +89,7 @@
 
 -   **Endpoint:** `/consuming_api/countries/<int:id>`
 -   **Method:** `PUT`
--   **Description:** Updates one specific patient by it´s id.
+-   **Description:** Updates one specific Country by it´s id.
 -   **Resquest body:**
 
 ```json
@@ -110,23 +110,7 @@
 
 -   **Endpoint:** `/consuming_api/countries/<int:id>`
 -   **Method:** `DELETE`
--   **Description:** Deletes one specific patient by it´s id.
--   **Response body:**
-
-```
-Empty data response
-```
-
-**Delete one specific Country**
-
--   **Endpoint:** `/consuming_api/countries/<int:id>`
--   **Method:** `DELETE`
--   **Description:** Deletes one specific patient by it´s id.
--   **Response body:**
-
-```
-Empty data response
-```
+-   **Description:** Deletes one specific Country by it´s id.
 
 **Create new Country instances**
 
@@ -159,8 +143,8 @@ Empty data response
 
 ```json
 {
-    "limit": 500,
-    "init": 1
+    "init": 1,
+    "limit": 500
 }
 ```
 
@@ -186,3 +170,108 @@ Empty data response
 	"file": "<file_data>"
 }
 ```
+
+# Product model documentation
+
+**List every Product instances**
+
+-   **Endpoint:** `/ecommerce/gallery`
+-   **Method:** `GET`
+-   **Description:** Getting all data from Product model database by json formats.
+-   **Response body:**
+
+```json
+{
+    "count": 76,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 52,
+            "name": "ZenGo Likely T-Shirt",
+            "description": "This product combines high performance with long-lasting battery. Designed for comfort and efficiency.",
+            "price": "624124.66",
+            "category": {
+                "id": 14,
+                "name": "Smartwatches"
+            },
+            "image": "http://127.0.0.1:8000/https%3A/fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2t.png"
+        },
+        {
+            "id": 51,
+            "name": "UrbanHome Hope Smartwatch",
+            "description": "This product combines lightweight build with smart features. Designed for comfort and efficiency.",
+            "price": "88340.23",
+            "category": {
+                "id": 6,
+                "name": "Mac Laptop Computers"
+            },
+            "image": "http://127.0.0.1:8000/https%3A/fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_t.png"
+        },
+        ...
+    ]
+}
+```
+
+**Create new Product instances**
+
+-   **Endpoint:** `/ecommerce/gallery-create`
+-   **Method:** `POST`
+-   **Description:** Creates a new Product instance.
+-   **Request body:**
+
+```json
+{
+    "name": "Type item name",
+    "description": "Type a description for your item",
+    "price": 27348,
+    // You must choose an ID that is in the range of 5 to 14
+    "category":  10
+}
+```
+
+-   **Response body:**
+
+```json
+{
+    "name":"Type item name",
+    "description":"Type a description for your item",
+    "price":"27348.00",
+    "category":10,
+    "image":"http://127.0.0.1:8000/https%3A/fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_t.png"
+}
+```
+
+**Update one specific Product**
+
+-   **Endpoint:** `/ecommerce/gallery/<int:id>`
+-   **Method:** `PUT`
+-   **Description:** Updates one specific Product by it´s id.
+-   **Resquest body:**
+
+```json
+{
+    "name": "Type item update name",
+    "description": "This is an example update data for this item",
+    "price": 94572,
+    "category":  8
+}
+```
+
+-   **Response body:**
+
+```json
+{
+    "name": "Type item update name",
+    "description": "This is an example update data for this item",
+    "price": "94572.00",
+    "category": 8,
+    "image": "http://127.0.0.1:8000/https%3A/fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_t.png"
+}
+```
+
+**Delete one specific Product**
+
+-   **Endpoint:** `/ecommerce/gallery/<int:id>`
+-   **Method:** `DELETE`
+-   **Description:** Deletes one specific Product by it´s id.
