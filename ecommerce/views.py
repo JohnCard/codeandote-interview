@@ -1,18 +1,19 @@
-from .models import Product, Category
-from .serializers import ProductSerializer, CategorySerializer
 from helpers.pagination import CustomPageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-# 
-from helpers.functions import create_excel_table, bar, line, scatter, pie
-from helpers.styles import DEFAULT_STYLE_DIC
 from openpyxl import Workbook
 from django.http import HttpResponse
+# 
+from .models import Product, Category
+from .serializers import ProductSerializer, CategorySerializer, CreateProductSerializer
+from helpers.functions import create_excel_table, bar, line, pie, histogram
+from helpers.styles import DEFAULT_STYLE_DIC
+
 # Create your views here.
 
-class ItemAPIView(ListCreateAPIView):
+class ListItemsAPIView(ListCreateAPIView):
     # Define serializer class
     serializer_class = ProductSerializer
     
@@ -31,17 +32,18 @@ class ItemAPIView(ListCreateAPIView):
     
     ordering_fields = ['id', 'name', 'price']
 
-    # Save bias
-    def perform_create(self, serializer):
-        return serializer.save()
-
     # Retrieve all items
     def get_queryset(self):
         return Product.objects.filter()
 
+class CreateItemAPIView(CreateAPIView):
+    queryset = Product.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = CreateProductSerializer
+
 class ItemRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     # Define serializer class
-    serializer_class = ProductSerializer
+    serializer_class = CreateProductSerializer
 
     # Define look up field
     lookup_field = "id"
@@ -80,23 +82,20 @@ def EcommerceExcelReport(request):
     ws = wb.active
     ws.title = "Excel stadistics report"  # worksheet name
 
-    # Second worksheet
-    tables_sheet = wb.create_sheet(title="Data")
-
     items = Product.objects.all()
 
     most_expensive_items = items.order_by('-price')[:10]
 
     x_headers = [f"Item - {item.pk}" for item in most_expensive_items]
-    most_expensive_items = [int(item.price) for item in most_expensive_items]
+    graph_values = [int(item.price) for item in most_expensive_items]
 
     PROPERTIES = {
             'labels': x_headers,
-            'graph_values': most_expensive_items,
+            'graph_values': graph_values,
             'colors': ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:purple', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan'],
-            'y_title': 'Ordered comparative',
-            'x_title': 'Item axis',
-            'main_title': 'The most expensive gallery items',
+            'y_title': 'Decreasing values',
+            'x_title': 'Item id axis',
+            'main_title': 'Most expensive gallery',
             'position': 'B2',
             'linestyle': 'solid',
             'legend': True,
@@ -109,63 +108,62 @@ def EcommerceExcelReport(request):
 
     bar(ws, PROPERTIES)
 
+    PROPERTIES.update({'position': 'B24', 'marker': 'o', 'linestyle': '-', 'color': 'black'})
+
+    line(ws, PROPERTIES)
+
+    PROPERTIES.update({'position': 'AE2',
+                       'font': 'Courier New',
+                        'weight': 'light',
+                        'size': 10
+                       })
+
+    PROPERTIES.pop('y_title')
+    PROPERTIES.pop('x_title')
+    pie(ws, PROPERTIES)
+
     cheapest_items = items.order_by('price')[:10]
     x_headers = [f"Item - {item.pk}" for item in cheapest_items]
     cheapest_items = [int(item.price) for item in cheapest_items]
 
-    PROPERTIES.update({'position': 'B24', 'labels': x_headers, 'graph_values': cheapest_items,
-                    'main_title': 'The cheapest gallery items', 'y_title': 'Cheapest items', })
+    PROPERTIES.update({'position': 'P2', 'labels': x_headers, 'graph_values': cheapest_items,
+                    'main_title': 'Cheapest gallery', 'y_title': 'Increasing values ', })
     
     bar(ws, PROPERTIES)
 
-    # PROPERTIES.update({'position': 'B24', 'labels': country_names, 'graph_values': population_values,
-    #                 'main_title': 'Population countries', 'y_title': 'Population', 'x_title': 'Countries'})
-    
-    # bar(ws, PROPERTIES)
+    PROPERTIES.update({'position': 'O24'})
 
-    # PROPERTIES.pop('y_title')
-    # PROPERTIES.pop('x_title')
+    line(ws, PROPERTIES)
 
-    # PROPERTIES.update({'position': 'Q2',
-    #                    'legend_title': 'Area distribution',
-    #                    'color': 'black',
-    #                    'font': 'Courier New',
-    #                     'weight': 'light',
-    #                     'size': 10
-    #                    })
+    PROPERTIES.update({'position': 'AB29'})
 
-    # pie(ws, PROPERTIES)
+    PROPERTIES.pop('y_title')
+    pie(ws, PROPERTIES)
 
-    # population_values = total_country_list.order_by('-population')[:10]
-    # country_names = [country.name for country in population_values]
-    # population_values = [country.population for country in population_values]
+    category_ids = list(Category.objects.values_list('id', flat=True))
+    id_histogram_list = []
 
-    # PROPERTIES.pop('y_title')
-    # PROPERTIES.pop('x_title')
+    for i in category_ids:
+        count = Product.objects.filter(category__id=i).count()
+        for u in range(count):
+            id_histogram_list.append(i)
 
-    # PROPERTIES.update({'position': 'Q28'})
+    PROPERTIES.update({'graph_values': id_histogram_list, 'position': 'B46', 'font_size': 10, 'color': 'blue', 'figsize': (10,4)})
 
-    # pie(ws, PROPERTIES)
+    histogram(ws, PROPERTIES)
 
-    # # Lineal graphics
+    # Second worksheet
+    tables_sheet = wb.create_sheet(title="Data")
 
-    # longest_longitudes = total_country_list.order_by('-longitude')[:10]
-    # long_values = [country.longitude for country in longest_longitudes]
-    # long_names = [country.name for country in longest_longitudes]
+    # Create table data
+    main_data = {'Product': [], 'Description': [], 'Price': [], 'Category': []}
 
-    # longest_latitudes = total_country_list.order_by('-latitude')[:10]
-    # lat_values = [country.latitude for country in longest_latitudes]
-    # lat_names = [country.name for country in longest_latitudes]
-
-    # PROPERTIES.update({'position': 'Z2', 'x_title': 'Countries', 'y_title': 'longitudes', 'main_title': 'Greatest longitudes',
-    #                 'graph_values': long_values, 'labels': long_names, 'figsize': (10, 4), 'marker': 'o', 'linestyle': '-'})
-
-    # line(ws, PROPERTIES)
-
-    # PROPERTIES.update({'position': 'Z28', 'x_title': 'Countries', 'y_title': 'latitudes', 'main_title': 'Greates latitudes',
-    #                 'graph_values': lat_values, 'labels': lat_names, 'figsize': (10, 4)})
-
-    # line(ws, PROPERTIES)
+    for item in items:
+        main_data['Product'].append(item.name)
+        main_data['Description'].append(item.description)
+        main_data['Price'].append(item.price)
+        main_data['Category'].append(item.category.name)
+    create_excel_table(tables_sheet, main_data, DEFAULT_STYLE_DIC, (2, 2))
 
     # Prepare your response as a .xlsx file
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

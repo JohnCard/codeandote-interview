@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from .models import Product, Category
-
+from django.forms.models import model_to_dict
 
 class CategorySerializer(ModelSerializer):
 
@@ -15,5 +15,10 @@ class ProductSerializer(ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "description", "category", "image"]
-        read_only_fields = ['category']
+        fields = ['id', 'name', 'description', 'price', 'category', 'image']
+
+class CreateProductSerializer(ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price', 'category', 'image']

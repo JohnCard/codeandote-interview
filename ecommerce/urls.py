@@ -1,11 +1,13 @@
 from django.urls import path
-from .views import ItemAPIView, ItemRetrieveUpdateDestroyAPIView, CategoryAPIView, EcommerceExcelReport
+from .views import ListItemsAPIView, ItemRetrieveUpdateDestroyAPIView, CategoryAPIView, EcommerceExcelReport, CreateItemAPIView
 
 urlpatterns = [
-    # Create & list item instances
-    path('gallery', ItemAPIView.as_view(), name='gallery'),
+    # List item instances
+    path('gallery', ListItemsAPIView.as_view(), name='gallery'),
     # Retrieve, update & delete item instances
-    path('gallery/<int:id>', ItemRetrieveUpdateDestroyAPIView.as_view(), name='country'),
+    path('gallery/<int:id>', ItemRetrieveUpdateDestroyAPIView.as_view(), name='gallery'),
+    # Create item instances
+    path('gallery-create', CreateItemAPIView.as_view(), name='gallery'),
     # Create & list category instances
     path('categories', CategoryAPIView.as_view(), name='categories'),
     # Generate excel report

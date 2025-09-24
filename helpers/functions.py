@@ -10,7 +10,6 @@ from openpyxl.drawing.image import Image as OpenpyxlImage
 from .styles import BORDER
 import random
 from faker import Faker
-import random
 
 fake = Faker()
 
@@ -218,7 +217,7 @@ def bar(ws, main_dic):
 
     # Show values above each bar
     for i, val in enumerate(graph_values):
-        ax.text(i, val + .2, f"{val}", ha="center", fontsize=8)
+        ax.text(i, val/5, f"{val}", ha="center", fontsize=8)
 
     apply_graph_styles(ws, ax, main_dic, fig)
 
@@ -248,17 +247,18 @@ def pie(ws, main_dic):
 
 # Specific function to create a histogram
 def histogram(ws, main_dic):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=main_dic['figsize'])
     graph_values = main_dic['graph_values']
-    set_values = len(set(graph_values))
+    set_values = set(graph_values)
 
-    n, bins, patches = ax.hist(graph_values, bins=set_values, color=main_dic['color'], edgecolor=main_dic['edgecolor'],
-                            linestyle=main_dic['linestyle'])
+    n, bins, patches = ax.hist(graph_values, bins=list(set_values), color=main_dic['color'], edgecolor=main_dic['edgecolor'], linestyle=main_dic['linestyle'])
 
     # Show values for each bar
     for count, bin_left, bin_right in zip(n, bins[:-1], bins[1:]):
         x = (bin_left + bin_right) / 2  # punto medio del bin
-        ax.text(x, count + 1, str(int(count)), ha='center', fontsize=main_dic['font_size'])
+        ax.text(x, count + .3, str(int(count)), ha='center', fontsize=main_dic['font_size'])
+
+    fig.subplots_adjust(top=1.55)
 
     apply_graph_styles(ws, ax, main_dic, fig)
 
