@@ -1,6 +1,6 @@
 # DB
-# db.sqlite3
-# img
+db.sqlite3
+img
 # Cache files
 *.pyc
 # Migrations
