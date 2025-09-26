@@ -39,12 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'consuming_api',
     'ecommerce',
+    'login_sessions',
     # Additional apps
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
     'corsheaders',
-    'login_sessions'
 ]
 
 MIDDLEWARE = [
@@ -151,4 +151,5 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
     # ]
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }

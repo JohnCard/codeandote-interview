@@ -106,6 +106,7 @@ def excel_report(request):
     name_list = [country.name for country in greatest_areas]
 
     PROPERTIES = {
+            'figsize': (10,4),
             'labels': name_list,
             'graph_values': area_list,
             'colors': ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:purple'],
@@ -117,9 +118,15 @@ def excel_report(request):
             'legend': True,
             'facecolor': '#d0d3d4',
             'background': '#f0f0f0',
-            'figsize': (10,4),
             'legend_title': 'Country list',
-            'edgecolor': 'black'
+            'edgecolor': 'black',
+            'bbox_to_anchor': (1.3, 0.8),
+            'font_size': 9,
+            'ha': 'center',
+            'fontweight': 'bold',
+            'border_linewidth': 3,
+            'border_color': 'black',
+            'margins_y': 0.2
         }
 
     bar(ws, PROPERTIES)
@@ -127,12 +134,15 @@ def excel_report(request):
     PROPERTIES.pop('y_title')
     PROPERTIES.pop('x_title')
 
-    PROPERTIES.update({'position': 'Q2',
-                       'legend_title': 'Area distribution',
-                       'color': 'black',
-                       'font': 'Courier New',
-                        'weight': 'light',
-                        'size': 10
+    PROPERTIES.update({'position': 'R2',
+                    'legend_title': 'Area distribution',
+                    'color': 'black',
+                    'font': 'Courier New',
+                    'weight': 'light',
+                    'size': 10,
+                    'shadow': True,
+                    'bbox_to_anchor': (1.2,.8),
+                    'autopct': '%1.1f%%'
                        })
 
 
@@ -150,7 +160,7 @@ def excel_report(request):
     PROPERTIES.pop('y_title')
     PROPERTIES.pop('x_title')
 
-    PROPERTIES.update({'position': 'Q28'})
+    PROPERTIES.update({'position': 'Q25'})
 
     pie(ws, PROPERTIES)
 
@@ -164,12 +174,13 @@ def excel_report(request):
     lat_values = [country.latitude for country in longest_latitudes]
     lat_names = [country.name for country in longest_latitudes]
 
-    PROPERTIES.update({'position': 'Z2', 'x_title': 'Countries', 'y_title': 'longitudes', 'main_title': 'Greatest longitudes',
-                    'graph_values': long_values, 'labels': long_names, 'figsize': (10, 4), 'marker': 'o', 'linestyle': '-'})
+    PROPERTIES.update({'position': 'AB2', 'x_title': 'Countries', 'y_title': 'longitudes', 'main_title': 'Greatest longitudes',
+                    'graph_values': long_values, 'labels': long_names, 'figsize': (10, 4), 'marker': 'o', 'linestyle': '-',
+                    'plot_color': 'black', 'linewidth': 0.5, 'font_size': 10, 'color': 'black', 'plot_text_color': 'black'})
 
     line(ws, PROPERTIES)
 
-    PROPERTIES.update({'position': 'Z28', 'x_title': 'Countries', 'y_title': 'latitudes', 'main_title': 'Greates latitudes',
+    PROPERTIES.update({'position': 'AA25', 'x_title': 'Countries', 'y_title': 'latitudes', 'main_title': 'Greates latitudes',
                     'graph_values': lat_values, 'labels': lat_names, 'figsize': (10, 4)})
 
     line(ws, PROPERTIES)
@@ -179,7 +190,7 @@ def excel_report(request):
     area_list = [country.area for country in total_country_list]
     population_values = [country.population for country in total_country_list]
 
-    PROPERTIES.update({'position': 'AM12', 'graph_values': population_values, 'graph_values_b': area_list,
+    PROPERTIES.update({'position': 'AO12', 'graph_values': population_values, 'graph_values_b': area_list,
                     'main_title': 'Population vs Area', 'x_title': 'Population', 'y_title': 'Area'})
 
     scatter(ws, PROPERTIES)

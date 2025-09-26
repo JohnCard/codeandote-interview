@@ -185,19 +185,22 @@ def set_img(ws, position, fig):
 
 # Apply graph styles for your matplotlib picture/figure
 def apply_graph_styles(ws, ax, main_dic, fig, grid=False):
-    ax.set_title(main_dic['main_title'], fontsize=10, fontweight="bold")
+    ax.set_title(main_dic['main_title'], fontsize=main_dic['font_size'], fontweight=main_dic['fontweight'])
     if 'x_title' in main_dic:
-        ax.set_xlabel(main_dic['x_title'], fontsize=10)
+        ax.set_xlabel(main_dic['x_title'], fontsize=main_dic['font_size'])
     if 'y_title' in main_dic:
-        ax.set_ylabel(main_dic['y_title'], fontsize=10)
+        ax.set_ylabel(main_dic['y_title'], fontsize=main_dic['font_size'])
     ax.tick_params(axis='x', rotation=25)
 
     fig.patch.set_facecolor(main_dic['facecolor'])  # Fondo exterior
     ax.set_facecolor(main_dic['background'])        # Fondo del área de gráfico
+    # Agregar borde alrededor de la figura completa
+    fig.patch.set_linewidth(main_dic['border_linewidth'])  # Grosor del borde
+    fig.patch.set_edgecolor(main_dic['border_color'])  # Color del borde
 
     if grid == True:
-        ax.grid(color = 'black', linestyle = '-', linewidth = 0.5)
-
+        ax.grid(color = main_dic['color'], linestyle = main_dic['linestyle'], linewidth = main_dic['linewidth'])
+    
     set_img(ws, main_dic['position'], fig)
 
 # Specific function to create a bar graph
@@ -206,43 +209,45 @@ def bar(ws, main_dic):
 
     x_labels = main_dic['labels']
     graph_values = main_dic['graph_values']
-    bar_colors = main_dic['colors']
 
-    if 'legend' in main_dic:
-        bar_labels = x_labels
-        ax.bar(x_labels, graph_values, label=bar_labels, color=bar_colors, edgecolor=main_dic['edgecolor'])
-        ax.legend(title=main_dic['legend_title'], loc="center left", bbox_to_anchor=(1, 0.5))
-    else:
-        ax.var(x_labels, graph_values, color=bar_colors, edgecolor='black')
+    # El parámetro edgecolor sirve para darle un color al borde de cada barra
+    # bbox_to_anchor sirve para definir el tamaño general del gráfico entero o el ancho
+    ax.bar(x_labels, graph_values, label=x_labels, color=main_dic['colors'], edgecolor=main_dic['edgecolor'])
+    'Suported values for loc atributte'
+    'best', 'upper right', 'upper left', 'lower left', 'lower right', 'right', 'center left', 'center right', 'lower center', 'upper center', 'center'
+    ax.legend(title=main_dic['legend_title'], loc="best", bbox_to_anchor=main_dic['bbox_to_anchor'])
 
     # Show values above each bar
     for i, val in enumerate(graph_values):
-        ax.text(i, val/5, f"{val}", ha="center", fontsize=8)
+        ax.text(i, val+val*.1, f"{val}", ha=main_dic['ha'], fontsize=main_dic['font_size'])
+
+    ax.margins(y=main_dic['margins_y'])
 
     apply_graph_styles(ws, ax, main_dic, fig)
 
 # Specific function to create a lineal graph
 def line(ws, main_dic):
     fig, ax = plt.subplots(figsize=main_dic['figsize'])
-    ax.plot(main_dic['labels'], main_dic['graph_values'], marker=main_dic['marker'], linestyle=main_dic['linestyle'])
+    labels = main_dic['labels']
+    graph_values = main_dic['graph_values']
+    ax.plot(labels, graph_values, marker=main_dic['marker'], linestyle=main_dic['linestyle'], color=main_dic['plot_color'])
 
-    # Show values for each point
-    for i, valor in enumerate(main_dic['graph_values']):
-        ax.text(main_dic['labels'][i], valor + 1, str(valor), ha='center', fontsize=10, color=main_dic['color'])
+    for i, valor in enumerate(graph_values):
+        # El parámetro ha sirve para centrar los textos de los valores que se muestran por cada punto
+        ax.text(labels[i], valor, str(valor), ha=main_dic['ha'], fontsize=main_dic['font_size'], color=main_dic['plot_text_color'])
 
     apply_graph_styles(ws, ax, main_dic, fig, True)
 
 # Specific function to create a pie chart
 def pie(ws, main_dic):
     fig, ax = plt.subplots()
-    graph_values = main_dic['graph_values']
     # '%1.1f%%' significa:
     # 1.1f: un decimal (por ejemplo, 25.3%)
     # %%: el símbolo de porcentaje
-    ax.pie(graph_values, labels=main_dic['labels'], autopct='%1.1f%%', shadow=True,
-        textprops={'color': main_dic['color'], 'font': main_dic['font'], 'weight': main_dic['weight'], 'size': main_dic['size']},)
-    plt.legend(title=main_dic['legend_title'], loc="center left", bbox_to_anchor=(1, 1))
-    
+    ax.pie(main_dic['graph_values'], labels=main_dic['labels'], autopct=main_dic['autopct'], shadow=main_dic['shadow'],
+        textprops={'color': main_dic['color'], 'font': main_dic['font'], 'weight': main_dic['weight'], 'size': main_dic['size']})
+    plt.legend(title=main_dic['legend_title'], loc="center left", bbox_to_anchor=main_dic['bbox_to_anchor'])
+
     apply_graph_styles(ws, ax, main_dic, fig)
 
 # Specific function to create a histogram
@@ -256,9 +261,9 @@ def histogram(ws, main_dic):
     # Show values for each bar
     for count, bin_left, bin_right in zip(n, bins[:-1], bins[1:]):
         x = (bin_left + bin_right) / 2  # punto medio del bin
-        ax.text(x, count + .3, str(int(count)), ha='center', fontsize=main_dic['font_size'])
+        ax.text(x, count+count*.1, str(int(count)), ha=main_dic['ha'], fontsize=main_dic['font_size'])
 
-    fig.subplots_adjust(top=1.55)
+    ax.margins(y=main_dic['margins_y'])
 
     apply_graph_styles(ws, ax, main_dic, fig)
 
